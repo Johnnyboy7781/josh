@@ -25,7 +25,10 @@ fn main() {
                     eprintln!("{}", e);
                 }
             },
-            "exit" => return,
+            "exit" => {
+                println!("Bye bye!");
+                return;
+            },
             command => {
                 let child = Command::new(command)
                     .args(args)
