@@ -1,7 +1,9 @@
-use std::path::Path;
-use std::{env, process};
-use std::io::{Write, stdout, stdin};
-use std::str::SplitWhitespace;
+use std::io::{stdin, stdout, Write};
+use colored::Colorize;
+use dir::{get_curr, get_home};
+
+mod dir;
+mod command;
 
 fn main() {
     loop {
@@ -14,42 +16,20 @@ fn main() {
         let command = parts.next().unwrap();
         let args = parts;
         
-        run_command(command, args);
+        command::run(command, args);
     }
 }
 
 fn print_prefix() {
-    let home_dir = "/home/nixos";
+    let trail = ">";
 
-    let curr_dir = env::current_dir().unwrap_or_default();
-    let dir_str = curr_dir.to_str().unwrap_or("").replace(home_dir, "~");
+    let home_dir = get_home();
+    let curr_dir = get_curr();
 
-    print!("{} > ", dir_str);
+    let dir_str = curr_dir.replace(&home_dir, "~");
+
+    let full_prefix = format!("{} {} ", dir_str, trail).blue().bold();
+
+    print!("{}", full_prefix);
     let _ = stdout().flush();
-}
-
-fn run_command(command: &str, args: SplitWhitespace) {
-    match command {
-        "cd" => {
-            let new_dir = args.peekable().peek().map_or("/", |x| *x);
-            let root = Path::new(new_dir);
-            if let Err(e) = env::set_current_dir(&root) {
-                eprintln!("{}", e);
-            }
-        },
-        "exit" => {
-            println!("Bye bye!");
-            process::exit(0);
-        },
-        command => {
-            let child = process::Command::new(command)
-                .args(args)
-                .spawn();
-
-            match child {
-                Ok(mut child) => { let _ = child.wait(); },
-                Err(e) => eprintln!("{}", e)
-            }
-        }
-    }
 }
