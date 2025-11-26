@@ -1,14 +1,11 @@
 use std::path::Path;
-use std::env;
-use std::io::Write;
-use std::io::stdout;
-use std::process::Command;
-use std::io::stdin;
+use std::{env, process};
+use std::io::{Write, stdout, stdin};
+use std::str::SplitWhitespace;
 
 fn main() {
     loop {
-        print!("> ");
-        let _ = stdout().flush();
+        print_prefix();
 
         let mut input = String::new();
         stdin().read_line(&mut input).unwrap();
@@ -16,28 +13,42 @@ fn main() {
         let mut parts = input.trim().split_whitespace();
         let command = parts.next().unwrap();
         let args = parts;
+        
+        run_command(command, args);
+    }
+}
 
-        match command {
-            "cd" => {
-                let new_dir = args.peekable().peek().map_or("/", |x| *x);
-                let root = Path::new(new_dir);
-                if let Err(e) = env::set_current_dir(&root) {
-                    eprintln!("{}", e);
-                }
-            },
-            "exit" => {
-                println!("Bye bye!");
-                return;
-            },
-            command => {
-                let child = Command::new(command)
-                    .args(args)
-                    .spawn();
+fn print_prefix() {
+    let home_dir = "/home/nixos";
 
-                match child {
-                    Ok(mut child) => { let _ = child.wait(); },
-                    Err(e) => eprintln!("{}", e)
-                }
+    let curr_dir = env::current_dir().unwrap_or_default();
+    let dir_str = curr_dir.to_str().unwrap_or("").replace(home_dir, "~");
+
+    print!("{} > ", dir_str);
+    let _ = stdout().flush();
+}
+
+fn run_command(command: &str, args: SplitWhitespace) {
+    match command {
+        "cd" => {
+            let new_dir = args.peekable().peek().map_or("/", |x| *x);
+            let root = Path::new(new_dir);
+            if let Err(e) = env::set_current_dir(&root) {
+                eprintln!("{}", e);
+            }
+        },
+        "exit" => {
+            println!("Bye bye!");
+            process::exit(0);
+        },
+        command => {
+            let child = process::Command::new(command)
+                .args(args)
+                .spawn();
+
+            match child {
+                Ok(mut child) => { let _ = child.wait(); },
+                Err(e) => eprintln!("{}", e)
             }
         }
     }
