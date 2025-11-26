@@ -25,13 +25,16 @@ fn main() {
                     eprintln!("{}", e);
                 }
             },
+            "exit" => return,
             command => {
-                let mut child = Command::new(command)
+                let child = Command::new(command)
                     .args(args)
-                    .spawn()
-                    .unwrap();
+                    .spawn();
 
-                let _ = child.wait();
+                match child {
+                    Ok(mut child) => { let _ = child.wait(); },
+                    Err(e) => eprintln!("{}", e)
+                }
             }
         }
     }
