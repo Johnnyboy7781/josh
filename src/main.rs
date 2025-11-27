@@ -82,6 +82,7 @@ fn main() {
             final_command.wait().unwrap();
         }
 
+        // add newline 
         println!("");
     }
 }
