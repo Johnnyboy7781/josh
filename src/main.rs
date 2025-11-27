@@ -3,9 +3,10 @@ use colored::Colorize;
 use dir::{get_curr, get_home};
 
 mod dir;
-mod command;
 
 fn main() {
+    let mut last_dir = String::new();
+
     loop {
         print_prefix();
 
@@ -22,7 +23,14 @@ fn main() {
 
             match command {
                 "cd" => {
-                    let new_dir = args.peekable().peek().map_or("/", |x| *x).replace("~", &get_home());
+                    let mut new_dir = args.peekable().peek().map_or("/", |x| *x).replace("~", &get_home());
+
+                    if new_dir.eq("-") {
+                        new_dir = last_dir;
+                    }
+
+                    last_dir = env::current_dir().unwrap().to_str().unwrap().to_string();
+
                     let root = Path::new(new_dir.as_str());
                     if let Err(e) = env::set_current_dir(&root) {
                         eprintln!("{}", e);
