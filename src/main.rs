@@ -16,16 +16,14 @@ fn main() {
         let mut previous_command = None;
 
         while let Some(command) = commands.next() {
-            // everything after the first whitespace character is interpreted as args to the command
             let mut parts = command.trim().split_whitespace();
             let command = parts.next().unwrap_or("");
             let args = parts;
 
             match command {
                 "cd" => {
-                    // default to '/' as new directory if one was not provided
-                    let new_dir = args.peekable().peek().map_or("/", |x| *x);
-                    let root = Path::new(new_dir);
+                    let new_dir = args.peekable().peek().map_or("/", |x| *x).replace("~", &get_home());
+                    let root = Path::new(new_dir.as_str());
                     if let Err(e) = env::set_current_dir(&root) {
                         eprintln!("{}", e);
                     }
