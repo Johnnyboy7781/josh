@@ -1,14 +1,18 @@
-use std::{env, io::{stdin, stdout, Write}, path::Path, process::{Command, Child, Stdio}};
-use colored::Colorize;
-use dir::{get_curr, get_home};
+use std::path::Path;
+use std::process::{Child, Command, Stdio};
+use std::io::stdin;
+use std::env;
+use dir::get_home;
 
 mod dir;
+mod prefix;
 
 fn main() {
+    let home: String = get_home();
     let mut last_dir = String::from(".");
 
     loop {
-        print_prefix();
+        prefix::print();
 
         let mut input = String::new();
         stdin().read_line(&mut input).unwrap();
@@ -23,7 +27,7 @@ fn main() {
 
             match command {
                 "cd" => {
-                    let mut new_dir = args.peekable().peek().map_or("/", |x| *x).replace("~", &get_home());
+                    let mut new_dir = args.peekable().peek().map_or("/", |x| *x).replace("~", &home);
 
                     if new_dir.eq("-") {
                         new_dir = last_dir;
@@ -80,16 +84,3 @@ fn main() {
     }
 }
 
-fn print_prefix() {
-    let trail = ">";
-
-    let home_dir = get_home();
-    let curr_dir = get_curr();
-
-    let dir_str = curr_dir.replace(&home_dir, "~");
-
-    let full_prefix = format!("{} {} ", dir_str, trail).blue().bold();
-
-    print!("{}", full_prefix);
-    let _ = stdout().flush();
-}
