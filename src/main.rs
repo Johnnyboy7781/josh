@@ -81,6 +81,8 @@ fn main() {
             // block until the final command has finished
             final_command.wait().unwrap();
         }
+
+        println!("");
     }
 }
 
