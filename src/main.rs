@@ -5,7 +5,7 @@ use dir::{get_curr, get_home};
 mod dir;
 
 fn main() {
-    let mut last_dir = String::new();
+    let mut last_dir = String::from(".");
 
     loop {
         print_prefix();
