@@ -12,7 +12,7 @@ fn main() {
     let mut last_dir = String::from(".");
 
     loop {
-        prefix::print();
+        prefix::print(&home);
 
         let mut input = String::new();
         stdin().read_line(&mut input).unwrap();
