@@ -23,9 +23,7 @@
                         lockFile = ./Cargo.lock;
                     };
 
-                    passthru = {
-                        shellPath = "/bin/josh";
-                    };
+                    shellPath = "/bin/josh";
 
                     meta = with pkgs.lib; {
                         description = "A basic shell written in Rust";
