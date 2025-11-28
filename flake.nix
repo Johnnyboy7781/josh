@@ -16,11 +16,15 @@
             {
                 packages.josh = pkgs.rustPlatform.buildRustPackage {
                     pname = "josh";
-                    version = "0.0.1";
+                    version = "0.0.2";
                     src = ./.;
 
                     cargoLock = {
                         lockFile = ./Cargo.lock;
+                    };
+
+                    passthru = {
+                        shellPath = "/bin/josh";
                     };
 
                     meta = with pkgs.lib; {
@@ -28,7 +32,6 @@
                         license = licenses.mit;
                         platforms = platforms.linux;
                         mainProgram = "josh";
-                        shell = true;
                     };
                 };
 
